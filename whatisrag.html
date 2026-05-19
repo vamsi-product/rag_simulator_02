@@ -1,169 +1,435 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>RAG Simulator</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAG Pipeline Simulator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #0b1020;
-  --panel: rgba(255,255,255,0.08);
-  --border: rgba(255,255,255,0.14);
-  --text: #eef2ff;
-  --muted: #b8c0e0;
-  --accent: #7c3aed;
-  --accent2: #06b6d4;
-  --success: #22c55e;
-}
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  font-family: Inter, Arial, sans-serif;
-  background: radial-gradient(circle at top right, #1e1b4b, var(--bg));
-  color: var(--text);
-  min-height: 100vh;
-}
-.container { max-width: 1200px; margin: 0 auto; padding: 24px; }
-h1 { font-size: 2.2rem; }
-.subtitle { color: var(--muted); margin-bottom: 24px; }
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 20px;
-}
-.card {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 20px;
-  backdrop-filter: blur(14px);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
-}
-textarea {
-  width: 100%; height: 120px; border-radius: 12px; padding: 12px;
-  background: rgba(255,255,255,0.08); color: white; border: 1px solid var(--border);
-}
-button {
-  margin-top: 12px; padding: 12px 18px; border: none; border-radius: 12px;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  color: white; font-weight: 700; cursor: pointer;
-}
-button:hover { transform: translateY(-1px); }
-.step {
-  padding: 14px; border-left: 4px solid transparent; margin-bottom: 10px;
-  border-radius: 12px; background: rgba(255,255,255,0.05);
-  transition: 0.4s;
-}
-.step.active { border-left-color: var(--success); background: rgba(34,197,94,0.12); }
-.code {
-  font-family: monospace; font-size: 0.9rem; background: rgba(0,0,0,0.25);
-  padding: 10px; border-radius: 10px; white-space: pre-wrap;
-}
-.chip {
-  display: inline-block; padding: 8px 12px; margin: 6px; border-radius: 999px;
-  background: rgba(124,58,237,0.22); border: 1px solid rgba(124,58,237,0.4);
-}
-.response {
-  padding: 16px; border-radius: 14px; background: rgba(6,182,212,0.12);
-  border: 1px solid rgba(6,182,212,0.25);
-}
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#0b0d14;--bg2:#111420;--bg3:#161926;
+    --border:#1e2235;--border2:#252b40;
+    --teal:#00d4aa;--teal-bg:rgba(0,212,170,.08);--teal-b:rgba(0,212,170,.25);
+    --amber:#f59e0b;--amber-bg:rgba(245,158,11,.08);--amber-b:rgba(245,158,11,.25);
+    --blue:#60a5fa;--blue-bg:rgba(96,165,250,.08);--blue-b:rgba(96,165,250,.22);
+    --green:#34d399;--purple:#a78bfa;
+    --t1:#e2e8f8;--t2:#8892ab;--t3:#4a5272;
+    --mono:'DM Mono',monospace;--sans:'Sora',sans-serif;
+    --r:8px;--r2:12px;
+  }
+  body{background:var(--bg);color:var(--t1);font-family:var(--sans);min-height:100vh}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:48px 48px;opacity:.4;pointer-events:none;z-index:0}
+
+  .wrap{max-width:1000px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+
+  /* HEADER */
+  .hdr{padding:52px 0 40px;text-align:center}
+  .hdr-tag{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--teal);border:1px solid var(--teal-b);background:var(--teal-bg);padding:4px 14px;border-radius:3px;margin-bottom:22px}
+  .hdr-tag::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite}
+  @keyframes pulse{50%{opacity:.25}}
+  .hdr h1{font-size:clamp(1.9rem,4.5vw,3rem);font-weight:600;letter-spacing:-.03em;color:#fff;line-height:1.1;margin-bottom:12px}
+  .hdr h1 span{color:var(--teal)}
+  .hdr p{font-size:14px;color:var(--t2);max-width:440px;margin:0 auto;line-height:1.7}
+
+  /* PIPELINE */
+  .pipe-wrap{overflow-x:auto;padding:32px 0 12px}
+  .pipe{display:flex;align-items:flex-start;min-width:560px;position:relative}
+  .phase-lbl{font-family:var(--mono);font-size:10px;letter-spacing:.1em;position:absolute;top:0;white-space:nowrap}
+  .phase-lbl.t{color:var(--teal)}
+  .phase-lbl.a{color:var(--amber);right:0}
+  .pipe-inner{display:flex;align-items:flex-start;width:100%;padding-top:22px}
+  .nd-col{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0}
+  .nd-btn{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--border2);background:var(--bg2);color:var(--t3);font-family:var(--mono);font-size:14px;font-weight:500;cursor:pointer;transition:all .22s;display:flex;align-items:center;justify-content:center}
+  .nd-btn:hover{border-color:var(--t2);color:var(--t1)}
+  .nd-btn.at{border-color:var(--teal);background:var(--teal-bg);color:var(--teal);box-shadow:0 0 16px rgba(0,212,170,.2)}
+  .nd-btn.aq{border-color:var(--amber);background:var(--amber-bg);color:var(--amber);box-shadow:0 0 16px rgba(245,158,11,.2)}
+  .nd-btn.done{opacity:.55}
+  .nd-btn.done.at,.nd-btn.done.aq{opacity:.65}
+  .nd-lbl{font-size:11px;color:var(--t3);text-align:center;transition:color .22s;white-space:nowrap}
+  .nd-btn.at~.nd-lbl,.nd-btn.aq~.nd-lbl,.nd-btn.done~.nd-lbl{color:var(--t2)}
+  .conn{flex:1;height:1.5px;background:var(--border);margin-top:20px;transition:background .3s}
+  .conn.ct{background:var(--teal-b)}
+  .conn.ca{background:var(--amber-b)}
+  .divider{width:1px;height:40px;background:var(--border2);margin:20px 20px 0;flex-shrink:0;position:relative}
+  .divider::before{content:'offline → online';position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:9px;color:var(--t3);white-space:nowrap;letter-spacing:.05em}
+
+  /* STAGE */
+  .stage{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+  .s-hdr{padding:18px 24px;border-bottom:1px solid var(--border);background:var(--bg3)}
+  .s-badge{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;padding:3px 10px;border-radius:3px;margin-bottom:8px}
+  .sb-t{background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal-b)}
+  .sb-a{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-b)}
+  .s-title{font-size:17px;font-weight:600;color:#fff;margin-bottom:6px}
+  .s-desc{font-size:13px;color:var(--t2);line-height:1.7}
+  .s-desc strong{color:var(--t1);font-weight:500}
+  .s-body{padding:24px}
+  .sec-lbl{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--t3);margin-bottom:14px;text-transform:uppercase}
+  .panel{display:none}
+  .panel.on{display:block}
+
+  /* CHUNKS */
+  .chunk{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;display:flex;gap:12px;align-items:flex-start;opacity:0;animation:fadeUp .35s ease forwards}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .cid{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--teal);background:var(--teal-bg);border:1px solid var(--teal-b);padding:2px 8px;border-radius:3px;white-space:nowrap;flex-shrink:0;margin-top:2px}
+  .cid-a{color:var(--amber);background:var(--amber-bg);border-color:var(--amber-b)}
+  .ctxt{font-size:13px;color:var(--t2);line-height:1.65}
+
+  /* VECTORS */
+  .vbox{font-family:var(--mono);font-size:11px;background:rgba(96,165,250,.05);border:1px solid var(--blue-b);border-radius:var(--r);padding:8px 12px;display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:8px}
+  .vd{color:var(--blue)}
+  .vl{color:var(--t3);font-size:10px}
+  .vd-a{color:var(--amber)}
+
+  /* VDB TABLE */
+  .vdb-t{width:100%;border-collapse:collapse;font-size:13px}
+  .vdb-t thead th{text-align:left;padding:8px 12px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--t3);border-bottom:1px solid var(--border)}
+  .vdb-r{border-bottom:1px solid var(--border);opacity:0;animation:fadeUp .35s ease forwards}
+  .vdb-r td{padding:10px 12px;color:var(--t2);font-size:12px}
+  .vdb-r td:first-child{font-family:var(--mono);font-weight:500;color:var(--teal)}
+  .vdb-r td:nth-child(3){font-family:var(--mono);color:var(--blue)}
+  .status-ok{color:var(--green);font-family:var(--mono);font-size:11px;display:inline-flex;align-items:center;gap:6px}
+  .status-ok::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+
+  /* QUERY STEP */
+  .q-box{background:var(--bg3);border:1px solid var(--amber-b);border-radius:var(--r);padding:14px 18px;font-size:14px;color:var(--t1);line-height:1.6}
+  .arrow-dn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:12px 0}
+  .arrow-dn-lbl{font-family:var(--mono);font-size:10px;color:var(--t3);letter-spacing:.05em}
+  .arrow-dn-line{width:1.5px;height:24px;background:var(--border2)}
+  .arrow-dn-head{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid var(--border2)}
+
+  /* SIMILARITY */
+  .sim-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;opacity:0;animation:fadeUp .35s ease forwards}
+  .sim-item.top{border-color:var(--amber-b);background:rgba(245,158,11,.05)}
+  .sim-row-hdr{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .sim-txt{font-size:12px;color:var(--t2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .sim-score{font-family:var(--mono);font-size:13px;font-weight:500;flex-shrink:0}
+  .sim-item.top .sim-score{color:var(--amber)}
+  .sim-item:not(.top) .sim-score{color:var(--t3)}
+  .sel-badge{font-family:var(--mono);font-size:9px;font-weight:500;color:var(--amber);background:var(--amber-bg);border:1px solid var(--amber-b);padding:2px 7px;border-radius:3px;flex-shrink:0}
+  .trk{height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+  .fill{height:100%;border-radius:2px;width:0;transition:width 1.2s cubic-bezier(.2,0,0,1)}
+  .fill.top{background:var(--amber)}
+  .fill.low{background:var(--border2)}
+
+  /* PROMPT BLOCKS */
+  .pb{border-radius:var(--r);padding:12px 16px;margin-bottom:8px;opacity:0;animation:fadeUp .35s ease forwards}
+  .pb-sys{background:var(--bg3);border:1px solid var(--border)}
+  .pb-ctx{background:var(--amber-bg);border:1px solid var(--amber-b)}
+  .pb-usr{background:var(--blue-bg);border:1px solid var(--blue-b)}
+  .pb-lbl{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.08em;margin-bottom:6px}
+  .pb-sys .pb-lbl{color:var(--t3)}
+  .pb-ctx .pb-lbl{color:var(--amber)}
+  .pb-usr .pb-lbl{color:var(--blue)}
+  .pb-body{font-size:13px;color:var(--t2);line-height:1.65}
+  .pb-body .hi{font-family:var(--mono);font-size:10px;color:var(--amber);margin-right:4px}
+  .pb-body strong{color:var(--t1);font-weight:500}
+
+  /* LLM OUTPUT */
+  .out-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:18px;opacity:0;animation:fadeUp .3s ease forwards 1.1s}
+  .out-lbl{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.1em;color:var(--green);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .out-lbl::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite}
+  .out-txt{font-size:14px;color:var(--t1);line-height:1.8}
+  .cur{display:inline-block;width:2px;height:14px;background:var(--green);animation:blink 1s step-end infinite;vertical-align:text-bottom;margin-left:1px}
+  @keyframes blink{50%{opacity:0}}
+
+  /* INSIGHT */
+  .insight{border-left:2px solid var(--teal-b);background:var(--teal-bg);border-radius:0 var(--r) var(--r) 0;padding:12px 16px;font-size:13px;color:var(--t2);line-height:1.7;margin-top:18px;opacity:0;animation:fadeUp .35s ease forwards}
+  .insight.a{border-left-color:var(--amber-b);background:var(--amber-bg)}
+  .insight strong{color:var(--teal);font-family:var(--mono);font-size:10px;letter-spacing:.08em;display:block;margin-bottom:4px}
+  .insight.a strong{color:var(--amber)}
+
+  /* CONTROLS */
+  .ctrls{display:flex;align-items:center;justify-content:center;gap:16px;padding:28px 0 52px}
+  .cbtn{background:var(--bg2);border:1px solid var(--border2);color:var(--t2);padding:9px 22px;border-radius:var(--r);cursor:pointer;font-family:var(--sans);font-size:13px;font-weight:500;transition:all .18s}
+  .cbtn:hover:not([disabled]){border-color:var(--t2);color:var(--t1);background:var(--bg3)}
+  .cbtn[disabled]{opacity:.3;cursor:not-allowed}
+  .cbtn.go{background:var(--teal-bg);border-color:var(--teal-b);color:var(--teal)}
+  .cbtn.go:hover:not([disabled]){background:rgba(0,212,170,.15);box-shadow:0 0 20px rgba(0,212,170,.15)}
+  .step-ctr{font-family:var(--mono);font-size:12px;color:var(--t3);min-width:44px;text-align:center}
+  .rows{display:flex;flex-direction:column;gap:8px}
 </style>
 </head>
 <body>
-<div class="container">
-  <h1>RAG Simulator</h1>
-  <p class="subtitle">Interactive Retrieval-Augmented Generation simulation to understand each architectural step.</p>
+<div class="wrap">
 
-  <div class="grid">
-    <div class="card">
-      <h2>Knowledge Base</h2>
-      <textarea id="kb">RAG stands for Retrieval-Augmented Generation.
-Vector embeddings represent semantic meaning numerically.
-Documents are split into chunks before indexing.
-Similarity search finds relevant chunks for a user query.
-LLMs generate grounded answers using retrieved context.</textarea>
-      <h2>User Query</h2>
-      <textarea id="query">How does RAG improve LLM answers?</textarea>
-      <button onclick="runSimulation()">Run RAG Simulation</button>
-    </div>
+  <header class="hdr">
+    <div class="hdr-tag">Interactive Simulator</div>
+    <h1>RAG Pipeline <span>Simulator</span></h1>
+    <p>Step through every stage of Retrieval-Augmented Generation — from document indexing to final LLM output.</p>
+  </header>
 
-    <div class="card">
-      <h2>RAG Pipeline</h2>
-      <div id="steps">
-        <div class="step" id="step1">1. Chunk documents</div>
-        <div class="step" id="step2">2. Create embeddings</div>
-        <div class="step" id="step3">3. Embed user query</div>
-        <div class="step" id="step4">4. Similarity retrieval</div>
-        <div class="step" id="step5">5. Prompt augmentation</div>
-        <div class="step" id="step6">6. LLM response generation</div>
+  <!-- Pipeline Nav -->
+  <div class="pipe-wrap">
+    <div class="pipe">
+      <span class="phase-lbl t">Indexing · offline</span>
+      <span class="phase-lbl a">Query · runtime</span>
+      <div class="pipe-inner">
+        <div class="nd-col">
+          <button class="nd-btn at" id="nd1" onclick="goTo(1)" title="Chunking">1</button>
+          <span class="nd-lbl">Chunks</span>
+        </div>
+        <div class="conn ct" id="cn1"></div>
+        <div class="nd-col">
+          <button class="nd-btn" id="nd2" onclick="goTo(2)" title="Embeddings">2</button>
+          <span class="nd-lbl">Embed</span>
+        </div>
+        <div class="conn" id="cn2"></div>
+        <div class="nd-col">
+          <button class="nd-btn" id="nd3" onclick="goTo(3)" title="Vector Database">3</button>
+          <span class="nd-lbl">Vector DB</span>
+        </div>
+        <div class="divider"></div>
+        <div class="nd-col">
+          <button class="nd-btn" id="nd4" onclick="goTo(4)" title="Query Processing">4</button>
+          <span class="nd-lbl">Query</span>
+        </div>
+        <div class="conn" id="cn3"></div>
+        <div class="nd-col">
+          <button class="nd-btn" id="nd5" onclick="goTo(5)" title="Similarity Search">5</button>
+          <span class="nd-lbl">Retrieve</span>
+        </div>
+        <div class="conn" id="cn4"></div>
+        <div class="nd-col">
+          <button class="nd-btn" id="nd6" onclick="goTo(6)" title="LLM Generation">6</button>
+          <span class="nd-lbl">Generate</span>
+        </div>
       </div>
     </div>
-
-    <div class="card">
-      <h2>Simulator Output</h2>
-      <div id="output"></div>
-    </div>
   </div>
+
+  <!-- Stage -->
+  <div class="stage">
+
+    <!-- Step 1 -->
+    <div class="panel on" id="p1">
+      <div class="s-hdr">
+        <div class="s-badge sb-t">Step 1 · Indexing (offline)</div>
+        <div class="s-title">Knowledge base & chunking</div>
+        <div class="s-desc">Before any user ever queries the system, source documents are split into smaller, self-contained <strong>chunks</strong>. This entire indexing pipeline runs <strong>once, offline</strong> — not at query time.</div>
+      </div>
+      <div class="s-body" id="b1"></div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="panel" id="p2">
+      <div class="s-hdr">
+        <div class="s-badge sb-t">Step 2 · Indexing (offline)</div>
+        <div class="s-title">Embedding generation</div>
+        <div class="s-desc">Each chunk is passed through an <strong>embedding model</strong> (e.g. text-embedding-ada-002, BGE, Cohere) which converts it into a high-dimensional vector. <strong>Similar text → similar vectors.</strong></div>
+      </div>
+      <div class="s-body" id="b2"></div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="panel" id="p3">
+      <div class="s-hdr">
+        <div class="s-badge sb-t">Step 3 · Indexing (offline)</div>
+        <div class="s-title">Vector database</div>
+        <div class="s-desc">All embeddings are stored in a <strong>vector database</strong> (Pinecone, Weaviate, Qdrant, pgvector) optimised for fast nearest-neighbour search. Indexing is now <strong>complete</strong>.</div>
+      </div>
+      <div class="s-body" id="b3"></div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="panel" id="p4">
+      <div class="s-hdr">
+        <div class="s-badge sb-a">Step 4 · Runtime</div>
+        <div class="s-title">Query processing</div>
+        <div class="s-desc">A user submits a query at runtime. It's passed through the <strong>same embedding model</strong> as the documents — so the query vector lives in the same semantic space and can be meaningfully compared.</div>
+      </div>
+      <div class="s-body" id="b4"></div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="panel" id="p5">
+      <div class="s-hdr">
+        <div class="s-badge sb-a">Step 5 · Runtime</div>
+        <div class="s-title">Similarity search & top-k retrieval</div>
+        <div class="s-desc"><strong>Cosine similarity</strong> scores the query vector against every stored chunk. The <strong>top-k most similar chunks</strong> (k = 2 here) are selected and passed forward — not the whole database.</div>
+      </div>
+      <div class="s-body" id="b5"></div>
+    </div>
+
+    <!-- Step 6 -->
+    <div class="panel" id="p6">
+      <div class="s-hdr">
+        <div class="s-badge sb-a">Step 6 · Runtime</div>
+        <div class="s-title">Augmented prompt & LLM generation</div>
+        <div class="s-desc">The retrieved chunks are combined with the user's query into an <strong>augmented prompt</strong>. The LLM generates a response grounded in this targeted context — not from parametric memory alone.</div>
+      </div>
+      <div class="s-body" id="b6"></div>
+    </div>
+
+  </div>
+
+  <!-- Controls -->
+  <div class="ctrls">
+    <button class="cbtn" id="prev-b" onclick="goTo(cur-1)" disabled>← Prev</button>
+    <span class="step-ctr" id="ctr">1 / 6</span>
+    <button class="cbtn go" id="next-b" onclick="goTo(cur+1)">Next →</button>
+  </div>
+
 </div>
 
 <script>
-function fakeEmbedding(text) {
-  return text.toLowerCase().split(/\W+/).filter(Boolean);
+const chunks=[
+  {id:'C1',text:'Mercury is the smallest planet in our solar system and closest to the Sun. It has no atmosphere and surface temperatures range from −180°C to +430°C.',emb:[0.82,-.31,0.65,0.12,-.44,0.93,-.28,0.61]},
+  {id:'C2',text:'Venus is the second planet from the Sun and the hottest planet in our solar system with surface temperatures around 465°C due to its thick CO₂ atmosphere.',emb:[0.76,-.28,0.71,0.08,-.51,0.88,-.22,0.57]},
+  {id:'C3',text:'Mars is known as the Red Planet due to iron oxide on its surface. It has the largest volcano in the solar system, Olympus Mons, standing 22 km tall.',emb:[-.12,0.67,-.23,0.88,0.41,-.35,0.72,-.19]},
+  {id:'C4',text:'Jupiter is the largest planet in our solar system. It has a giant storm called the Great Red Spot that has been raging for hundreds of years.',emb:[-.45,0.82,-.18,0.75,0.62,-.28,0.53,-.41]},
+  {id:'C5',text:'Saturn is famous for its stunning ring system made of ice and rock. It has 83 known moons, including Titan which has a thick nitrogen atmosphere.',emb:[-.33,0.71,-.29,0.69,0.48,-.41,0.66,-.32]},
+];
+const Q='Which planet has the most extreme temperatures?';
+const qEmb=[0.79,-.29,0.68,0.10,-.48,0.90,-.25,0.59];
+const sims=[
+  {id:'C1',score:0.94,top:true},
+  {id:'C2',score:0.91,top:true},
+  {id:'C3',score:0.31,top:false},
+  {id:'C5',score:0.28,top:false},
+  {id:'C4',score:0.24,top:false},
+];
+const llmOut=`Based on the retrieved context, Mercury has the most extreme temperature range — swinging from −180°C in shadowed craters to +430°C on the sunlit surface. A span of over 600°C, caused entirely by its lack of atmosphere which removes any thermal regulation.
+
+Venus, however, holds the record for the highest sustained surface temperature at ~465°C. Its dense CO₂ atmosphere triggers a runaway greenhouse effect, locking heat in permanently.
+
+Summary: Mercury for the widest temperature swing. Venus for the highest peak heat.`;
+
+let cur=1;
+const phases=[null,'t','t','t','a','a','a'];
+
+function vecHtml(v,cls='vd'){
+  return v.map((d,i)=>`<span><span class="vl">d${i+1}:</span><span class="${cls}"> ${d>=0?'+':''}${d.toFixed(2)}</span></span>`).join('');
 }
 
-function similarity(queryTokens, docTokens) {
-  let overlap = queryTokens.filter(t => docTokens.includes(t));
-  return overlap.length;
+function initP1(){
+  let h=`<div class="sec-lbl">Knowledge base · 5 chunks</div><div class="rows">`;
+  chunks.forEach((c,i)=>{ h+=`<div class="chunk" style="animation-delay:${i*.09}s"><span class="cid">${c.id}</span><span class="ctxt">${c.text}</span></div>`; });
+  h+=`</div><div class="insight" style="animation-delay:.6s"><strong>Key insight</strong>This entire indexing phase runs before deployment. Chunk size is a critical tuning parameter — too large blurs retrieval; too small strips context. Common strategies: fixed-size, sentence-level, or recursive paragraph chunking.</div>`;
+  document.getElementById('b1').innerHTML=h;
 }
 
-function activate(id) {
-  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+function initP2(){
+  let h=`<div class="sec-lbl">Chunks → 8-dimensional vectors (simplified)</div><div class="rows">`;
+  chunks.forEach((c,i)=>{ h+=`<div class="chunk" style="flex-direction:column;gap:8px;animation-delay:${i*.1}s"><div style="display:flex;gap:10px;align-items:center;"><span class="cid">${c.id}</span><span class="ctxt" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">${c.text.substring(0,55)}…</span></div><div class="vbox">${vecHtml(c.emb)}</div></div>`; });
+  h+=`</div><div class="insight" style="animation-delay:.8s"><strong>Key insight</strong>Real embedding models produce 768–3072 dimensions. Eight are shown here for clarity. The individual numbers are meaningless — only the <em>distances between vectors</em> matter. Notice C1 and C2 (both about planetary temperatures) have similar positive values in d1, d3, d6.</div>`;
+  document.getElementById('b2').innerHTML=h;
 }
 
-async function runSimulation() {
-  const kb = document.getElementById('kb').value;
-  const query = document.getElementById('query').value;
-  const output = document.getElementById('output');
-  output.innerHTML = '';
-
-  const chunks = kb.split('\n').filter(Boolean);
-
-  activate('step1');
-  await pause();
-  output.innerHTML += `<h3>Chunks</h3>${chunks.map(c => `<div class='chip'>${c}</div>`).join('')}`;
-
-  activate('step2');
-  await pause();
-  const embeddings = chunks.map(c => ({ text: c, vector: fakeEmbedding(c) }));
-  output.innerHTML += `<h3>Document Embeddings</h3><div class='code'>Semantic tokens created for each chunk</div>`;
-
-  activate('step3');
-  await pause();
-  const queryVector = fakeEmbedding(query);
-  output.innerHTML += `<h3>Query Embedding</h3><div class='code'>${queryVector.join(', ')}</div>`;
-
-  activate('step4');
-  await pause();
-  const ranked = embeddings.map(e => ({ ...e, score: similarity(queryVector, e.vector) }))
-                           .sort((a,b)=>b.score-a.score)
-                           .slice(0,2);
-  output.innerHTML += `<h3>Retrieved Chunks</h3>${ranked.map(r => `<div class='chip'>${r.text} (score: ${r.score})</div>`).join('')}`;
-
-  activate('step5');
-  await pause();
-  const prompt = `System: Answer using provided context only.\nContext:\n${ranked.map(r=>r.text).join('\n')}\nUser: ${query}`;
-  output.innerHTML += `<h3>Augmented Prompt</h3><div class='code'>${prompt}</div>`;
-
-  activate('step6');
-  await pause();
-  const response = `RAG improves LLM responses by retrieving relevant knowledge before generation, reducing hallucinations and increasing accuracy.`;
-  output.innerHTML += `<h3>LLM Response</h3><div class='response'>${response}</div>`;
+function initP3(){
+  let rows='';
+  chunks.forEach((c,i)=>{
+    const vp=c.emb.slice(0,3).map(v=>(v>=0?'+':'')+v.toFixed(2)).join(', ');
+    rows+=`<tr class="vdb-r" style="animation-delay:${i*.1}s"><td>${c.id}</td><td>${c.text.substring(0,48)}…</td><td>[${vp}, …]</td><td><span class="status-ok">indexed</span></td></tr>`;
+  });
+  document.getElementById('b3').innerHTML=`<div class="sec-lbl">Vector DB · 5 records stored</div><table class="vdb-t"><thead><tr><th>Chunk ID</th><th>Text excerpt</th><th>Vector (truncated)</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table><div class="insight" style="animation-delay:.7s"><strong>Key insight</strong>Steps 1–3 run offline before your app goes live. When a user submits a query, the vector DB is already fully built. This is the key architectural distinction — indexing (offline) vs retrieval (runtime).</div>`;
 }
 
-function pause() {
-  return new Promise(resolve => setTimeout(resolve, 1000));
+function initP4(){
+  document.getElementById('b4').innerHTML=`
+    <div class="sec-lbl">User query</div>
+    <div class="q-box" style="opacity:0;animation:fadeUp .3s ease forwards">${Q}</div>
+    <div class="arrow-dn" style="opacity:0;animation:fadeUp .3s ease forwards .5s">
+      <span class="arrow-dn-lbl">same embedding model</span>
+      <div class="arrow-dn-line"></div>
+      <div class="arrow-dn-head"></div>
+    </div>
+    <div class="sec-lbl" style="opacity:0;animation:fadeUp .3s ease forwards .8s">Query embedding vector</div>
+    <div class="chunk" style="flex-direction:column;gap:8px;opacity:0;animation:fadeUp .3s ease forwards .9s">
+      <div style="display:flex;gap:8px;align-items:center"><span class="cid cid-a">Query</span><span class="ctxt">${Q}</span></div>
+      <div class="vbox">${vecHtml(qEmb,'vd-a')}</div>
+    </div>
+    <div class="insight a" style="animation-delay:1.2s"><strong>Key insight</strong>The query uses the exact same embedding model as the documents. This is non-negotiable — both must be represented in the same vector space for similarity comparisons to be valid. Mixing models from different providers breaks this.</div>`;
 }
+
+function initP5(){
+  let h=`<div class="sec-lbl">Cosine similarity scores · k=2 selected</div><div class="rows">`;
+  sims.forEach((s,i)=>{
+    const c=chunks.find(x=>x.id===s.id);
+    h+=`<div class="sim-item${s.top?' top':''}" style="animation-delay:${i*.1}s">
+      <div class="sim-row-hdr">
+        <span class="cid${s.top?' cid-a':''}">${s.id}</span>
+        ${s.top?'<span class="sel-badge">selected ✓</span>':''}
+        <span class="sim-txt">${c.text.substring(0,60)}…</span>
+        <span class="sim-score">${s.score.toFixed(2)}</span>
+      </div>
+      <div class="trk"><div class="fill${s.top?' top':' low'}" data-w="${(s.score*100).toFixed(0)}"></div></div>
+    </div>`;
+  });
+  h+=`</div><div class="insight a" style="animation-delay:.8s"><strong>Key insight</strong>Only k=2 chunks are passed to the LLM — not the full database. This is why RAG is efficient and precise. Notice C1 (Mercury) scores 0.94 and C2 (Venus) scores 0.91 — both are semantically close to "extreme temperatures". C3, C4, C5 score below 0.35.</div>`;
+  document.getElementById('b5').innerHTML=h;
+  setTimeout(()=>{ document.querySelectorAll('.fill').forEach(el=>{ el.style.width=el.dataset.w+'%'; }); },350);
+}
+
+function initP6(){
+  const c1=chunks[0], c2=chunks[1];
+  document.getElementById('b6').innerHTML=`
+    <div class="sec-lbl">Augmented prompt assembly</div>
+    <div class="pb pb-sys" style="animation-delay:.05s">
+      <div class="pb-lbl">System prompt</div>
+      <div class="pb-body">You are a helpful assistant. Answer the user's question using only the provided context. If the context doesn't contain enough information, say so clearly.</div>
+    </div>
+    <div class="pb pb-ctx" style="animation-delay:.25s">
+      <div class="pb-lbl">Retrieved context · top-2 chunks</div>
+      <div class="pb-body">
+        <span class="hi">[C1]</span>${c1.text}<br><br>
+        <span class="hi">[C2]</span>${c2.text}
+      </div>
+    </div>
+    <div class="pb pb-usr" style="animation-delay:.45s">
+      <div class="pb-lbl">User query</div>
+      <div class="pb-body">${Q}</div>
+    </div>
+    <div class="sec-lbl" style="margin-top:20px;opacity:0;animation:fadeUp .3s ease forwards .8s">LLM output</div>
+    <div class="out-box">
+      <div class="out-lbl">Generated response</div>
+      <div class="out-txt" id="out-txt"></div>
+    </div>`;
+
+  const el=document.getElementById('out-txt');
+  let i=0;
+  function type(){
+    if(i<=llmOut.length){
+      el.innerHTML=llmOut.substring(0,i).replace(/\n\n/g,'<br><br>')+(i<llmOut.length?'<span class="cur"></span>':'');
+      i++;
+      setTimeout(type,i<2?80:15);
+    }
+  }
+  setTimeout(type,1300);
+}
+
+const inits=[null,initP1,initP2,initP3,initP4,initP5,initP6];
+
+function goTo(n){
+  if(n<1||n>6||n===cur&&n!==1) return;
+  cur=n;
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.getElementById('p'+n).classList.add('on');
+  inits[n]();
+
+  for(let i=1;i<=6;i++){
+    const nd=document.getElementById('nd'+i);
+    nd.className='nd-btn';
+    if(i===n) nd.classList.add('a'+phases[i]);
+    else if(i<n){ nd.classList.add('a'+phases[i]); nd.classList.add('done'); }
+  }
+
+  const fills=['ct','ct','ca','ca'];
+  const thresholds=[1,2,4,5];
+  [1,2,3,4].forEach((ci,i)=>{
+    const c=document.getElementById('cn'+ci);
+    c.className='conn'+(n>thresholds[i]?' '+fills[i]:'');
+  });
+
+  document.getElementById('prev-b').disabled=n===1;
+  const nb=document.getElementById('next-b');
+  nb.disabled=n===6;
+  nb.textContent=n===6?'Complete ✓':'Next →';
+  document.getElementById('ctr').textContent=n+' / 6';
+}
+
+goTo(1);
 </script>
 </body>
 </html>
