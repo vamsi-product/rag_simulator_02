@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RAG Simulator</title>
+<style>
+:root {
+  --bg: #0b1020;
+  --panel: rgba(255,255,255,0.08);
+  --border: rgba(255,255,255,0.14);
+  --text: #eef2ff;
+  --muted: #b8c0e0;
+  --accent: #7c3aed;
+  --accent2: #06b6d4;
+  --success: #22c55e;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Inter, Arial, sans-serif;
+  background: radial-gradient(circle at top right, #1e1b4b, var(--bg));
+  color: var(--text);
+  min-height: 100vh;
+}
+.container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+h1 { font-size: 2.2rem; }
+.subtitle { color: var(--muted); margin-bottom: 24px; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 20px;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+}
+textarea {
+  width: 100%; height: 120px; border-radius: 12px; padding: 12px;
+  background: rgba(255,255,255,0.08); color: white; border: 1px solid var(--border);
+}
+button {
+  margin-top: 12px; padding: 12px 18px; border: none; border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white; font-weight: 700; cursor: pointer;
+}
+button:hover { transform: translateY(-1px); }
+.step {
+  padding: 14px; border-left: 4px solid transparent; margin-bottom: 10px;
+  border-radius: 12px; background: rgba(255,255,255,0.05);
+  transition: 0.4s;
+}
+.step.active { border-left-color: var(--success); background: rgba(34,197,94,0.12); }
+.code {
+  font-family: monospace; font-size: 0.9rem; background: rgba(0,0,0,0.25);
+  padding: 10px; border-radius: 10px; white-space: pre-wrap;
+}
+.chip {
+  display: inline-block; padding: 8px 12px; margin: 6px; border-radius: 999px;
+  background: rgba(124,58,237,0.22); border: 1px solid rgba(124,58,237,0.4);
+}
+.response {
+  padding: 16px; border-radius: 14px; background: rgba(6,182,212,0.12);
+  border: 1px solid rgba(6,182,212,0.25);
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>RAG Simulator</h1>
+  <p class="subtitle">Interactive Retrieval-Augmented Generation simulation to understand each architectural step.</p>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Knowledge Base</h2>
+      <textarea id="kb">RAG stands for Retrieval-Augmented Generation.
+Vector embeddings represent semantic meaning numerically.
+Documents are split into chunks before indexing.
+Similarity search finds relevant chunks for a user query.
+LLMs generate grounded answers using retrieved context.</textarea>
+      <h2>User Query</h2>
+      <textarea id="query">How does RAG improve LLM answers?</textarea>
+      <button onclick="runSimulation()">Run RAG Simulation</button>
+    </div>
+
+    <div class="card">
+      <h2>RAG Pipeline</h2>
+      <div id="steps">
+        <div class="step" id="step1">1. Chunk documents</div>
+        <div class="step" id="step2">2. Create embeddings</div>
+        <div class="step" id="step3">3. Embed user query</div>
+        <div class="step" id="step4">4. Similarity retrieval</div>
+        <div class="step" id="step5">5. Prompt augmentation</div>
+        <div class="step" id="step6">6. LLM response generation</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Simulator Output</h2>
+      <div id="output"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function fakeEmbedding(text) {
+  return text.toLowerCase().split(/\W+/).filter(Boolean);
+}
+
+function similarity(queryTokens, docTokens) {
+  let overlap = queryTokens.filter(t => docTokens.includes(t));
+  return overlap.length;
+}
+
+function activate(id) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+async function runSimulation() {
+  const kb = document.getElementById('kb').value;
+  const query = document.getElementById('query').value;
+  const output = document.getElementById('output');
+  output.innerHTML = '';
+
+  const chunks = kb.split('\n').filter(Boolean);
+
+  activate('step1');
+  await pause();
+  output.innerHTML += `<h3>Chunks</h3>${chunks.map(c => `<div class='chip'>${c}</div>`).join('')}`;
+
+  activate('step2');
+  await pause();
+  const embeddings = chunks.map(c => ({ text: c, vector: fakeEmbedding(c) }));
+  output.innerHTML += `<h3>Document Embeddings</h3><div class='code'>Semantic tokens created for each chunk</div>`;
+
+  activate('step3');
+  await pause();
+  const queryVector = fakeEmbedding(query);
+  output.innerHTML += `<h3>Query Embedding</h3><div class='code'>${queryVector.join(', ')}</div>`;
+
+  activate('step4');
+  await pause();
+  const ranked = embeddings.map(e => ({ ...e, score: similarity(queryVector, e.vector) }))
+                           .sort((a,b)=>b.score-a.score)
+                           .slice(0,2);
+  output.innerHTML += `<h3>Retrieved Chunks</h3>${ranked.map(r => `<div class='chip'>${r.text} (score: ${r.score})</div>`).join('')}`;
+
+  activate('step5');
+  await pause();
+  const prompt = `System: Answer using provided context only.\nContext:\n${ranked.map(r=>r.text).join('\n')}\nUser: ${query}`;
+  output.innerHTML += `<h3>Augmented Prompt</h3><div class='code'>${prompt}</div>`;
+
+  activate('step6');
+  await pause();
+  const response = `RAG improves LLM responses by retrieving relevant knowledge before generation, reducing hallucinations and increasing accuracy.`;
+  output.innerHTML += `<h3>LLM Response</h3><div class='response'>${response}</div>`;
+}
+
+function pause() {
+  return new Promise(resolve => setTimeout(resolve, 1000));
+}
+</script>
+</body>
+</html>
