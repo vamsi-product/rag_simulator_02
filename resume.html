@@ -1,237 +1,379 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Futuristic Resume</title>
-<style>
-:root {
-  --bg: #07111f;
-  --panel: rgba(18, 31, 54, 0.72);
-  --line: rgba(120, 190, 255, 0.25);
-  --text: #e8f3ff;
-  --muted: #9eb8d6;
-  --accent: #52d6ff;
-  --accent2: #8b5cf6;
-  --glow: 0 0 30px rgba(82,214,255,0.25);
-}
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  font-family: Inter, Segoe UI, system-ui, sans-serif;
-  background:
-    radial-gradient(circle at top right, rgba(82,214,255,0.12), transparent 30%),
-    radial-gradient(circle at bottom left, rgba(139,92,246,0.15), transparent 35%),
-    linear-gradient(135deg, #040814, #0b1427 45%, #07111f);
-  color: var(--text);
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
-  pointer-events: none;
-}
-.container {
-  width: min(1200px, 92vw);
-  margin: 40px auto;
-  display: grid;
-  grid-template-columns: 340px 1fr;
-  gap: 24px;
-}
-.card {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 24px;
-  padding: 24px;
-  backdrop-filter: blur(14px);
-  box-shadow: var(--glow);
-}
-.left { position: sticky; top: 20px; height: fit-content; }
-.avatar {
-  width: 110px; height: 110px; border-radius: 24px;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  display: grid; place-items: center; font-size: 42px; font-weight: 800;
-  margin-bottom: 18px;
-}
-h1,h2,h3,p { margin: 0; }
-.name { font-size: 2rem; line-height: 1.1; }
-.role { color: var(--accent); margin-top: 8px; font-weight: 600; }
-.muted { color: var(--muted); }
-.section-title {
-  margin: 24px 0 16px;
-  font-size: 0.9rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--accent);
-}
-.tag-wrap { display: flex; flex-wrap: wrap; gap: 10px; }
-.tag {
-  padding: 10px 14px;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background: rgba(255,255,255,0.04);
-  font-size: 0.9rem;
-}
-.hero {
-  padding: 30px;
-  min-height: 220px;
-  position: relative;
-  overflow: hidden;
-}
-.hero::after {
-  content: "";
-  position: absolute;
-  width: 240px; height: 240px;
-  right: -80px; top: -80px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(82,214,255,0.2), transparent 70%);
-}
-.summary { font-size: 1.05rem; line-height: 1.7; max-width: 90%; }
-.timeline-item {
-  position: relative;
-  padding: 0 0 22px 24px;
-  border-left: 1px solid var(--line);
-}
-.timeline-item::before {
-  content: "";
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  background: var(--accent);
-  position: absolute; left: -5px; top: 5px;
-  box-shadow: 0 0 15px var(--accent);
-}
-.job-title { font-size: 1.1rem; font-weight: 700; }
-.job-meta { color: var(--accent); margin: 6px 0; }
-ul { padding-left: 18px; color: var(--muted); line-height: 1.7; }
-.metric {
-  display: grid; grid-template-columns: repeat(3,1fr); gap: 14px;
-}
-.metric .card { padding: 18px; }
-.metric-number { font-size: 1.6rem; font-weight: 800; color: var(--accent); }
-button {
-  margin-top: 18px;
-  width: 100%; padding: 14px;
-  border: none; border-radius: 14px;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  color: white; font-weight: 700; cursor: pointer;
-}
-@media (max-width: 900px) {
-  .container { grid-template-columns: 1fr; }
-  .left { position: static; }
-  .summary { max-width: 100%; }
-  .metric { grid-template-columns: 1fr; }
-}
-@media print {
-  body::before, button { display:none; }
-  body { background:white; color:black; }
-  .card { box-shadow:none; backdrop-filter:none; }
-}
-</style>
-</head>
-<body>
-<div class="container">
-  <aside class="card left">
-    <div class="avatar">PM</div>
-    <h1 class="name">Your Name</h1>
-    <p class="role">Product / Program / Strategy Professional</p>
-    <p class="muted" style="margin-top:12px; line-height:1.6;">
-      India • your.email@example.com • +91 XXXXXXXXXX • LinkedIn / Portfolio
-    </p>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RAG Simulator</title>
 
-    <div class="section-title">Core Skills</div>
-    <div class="tag-wrap">
-      <span class="tag">Product Strategy</span>
-      <span class="tag">Decision Making</span>
-      <span class="tag">Stakeholder Mgmt</span>
-      <span class="tag">Analytics</span>
-      <span class="tag">Roadmapping</span>
-      <span class="tag">Experimentation</span>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: white;
+      min-height: 100vh;
+      padding: 30px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 42px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #cbd5e1;
+      margin-bottom: 30px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 16px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    h2 {
+      margin-bottom: 15px;
+      color: #93c5fd;
+    }
+
+    textarea {
+      width: 100%;
+      height: 140px;
+      border-radius: 10px;
+      border: none;
+      padding: 12px;
+      resize: vertical;
+      margin-bottom: 15px;
+      background: rgba(255,255,255,0.12);
+      color: white;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(90deg, #7c3aed, #06b6d4);
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      opacity: 0.9;
+      transform: scale(1.01);
+    }
+
+    .step {
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.06);
+      border-left: 4px solid transparent;
+      transition: 0.3s;
+    }
+
+    .active {
+      border-left: 4px solid #22c55e;
+      background: rgba(34,197,94,0.15);
+    }
+
+    .output-section {
+      margin-bottom: 20px;
+    }
+
+    .label {
+      color: #67e8f9;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    .box {
+      background: rgba(0,0,0,0.3);
+      padding: 12px;
+      border-radius: 10px;
+      line-height: 1.5;
+      overflow-wrap: break-word;
+    }
+
+    .chip {
+      display: inline-block;
+      background: rgba(124,58,237,0.3);
+      padding: 8px 12px;
+      border-radius: 999px;
+      margin: 5px;
+      font-size: 13px;
+    }
+
+    .response {
+      background: rgba(6,182,212,0.15);
+      border: 1px solid rgba(6,182,212,0.3);
+    }
+
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>RAG Simulator</h1>
+  <p class="subtitle">
+    Understand Retrieval-Augmented Generation step-by-step
+  </p>
+
+  <div class="grid">
+
+    <!-- LEFT -->
+    <div class="card">
+
+      <h2>Knowledge Base</h2>
+
+      <textarea id="kb">
+RAG stands for Retrieval-Augmented Generation.
+Vector embeddings convert text into numerical semantic representations.
+Documents are divided into chunks before vector indexing.
+Similarity search retrieves the most relevant chunks.
+LLMs generate grounded responses using retrieved context.
+RAG reduces hallucinations in AI systems.
+      </textarea>
+
+      <h2>User Query</h2>
+
+      <textarea id="query">How does RAG improve LLM responses?</textarea>
+
+      <button onclick="runRAG()">
+        Run RAG Simulation
+      </button>
+
     </div>
 
-    <div class="section-title">Education</div>
-    <p><strong>Your Degree</strong></p>
-    <p class="muted">University • Year</p>
+    <!-- RIGHT -->
+    <div class="card">
 
-    <button onclick="window.print()">Export / Print Resume</button>
-  </aside>
+      <h2>RAG Pipeline</h2>
 
-  <main>
-    <section class="card hero">
-      <h2>Professional Summary</h2>
-      <p class="summary muted" id="summaryText">
-        Product-minded professional with strong decision-making, analytical thinking, and cross-functional execution experience. Prepared for high-performance product interviews with emphasis on structured problem solving, metrics thinking, and strategic trade-off evaluation.
-      </p>
-    </section>
+      <div id="step1" class="step">1. Chunk documents</div>
+      <div id="step2" class="step">2. Create embeddings</div>
+      <div id="step3" class="step">3. Convert query into embedding</div>
+      <div id="step4" class="step">4. Similarity search</div>
+      <div id="step5" class="step">5. Prompt augmentation</div>
+      <div id="step6" class="step">6. LLM response generation</div>
 
-    <section class="metric" style="margin:24px 0;">
-      <div class="card"><div class="metric-number" data-target="5">0</div><div class="muted">Major Initiatives</div></div>
-      <div class="card"><div class="metric-number" data-target="10">0</div><div class="muted">Cross-functional Projects</div></div>
-      <div class="card"><div class="metric-number" data-target="3">0</div><div class="muted">Core Domains</div></div>
-    </section>
+      <br>
 
-    <section class="card">
-      <h2>Experience</h2>
-      <div class="section-title">Career Timeline</div>
+      <div id="output"></div>
 
-      <div class="timeline-item">
-        <div class="job-title">Product / Strategy Role</div>
-        <div class="job-meta">Company Name • YYYY–Present</div>
-        <ul>
-          <li>Led ambiguous decision-making with measurable business impact.</li>
-          <li>Defined roadmap priorities using customer, business, and engineering constraints.</li>
-          <li>Built stakeholder alignment across teams and executive leadership.</li>
-        </ul>
-      </div>
+    </div>
 
-      <div class="timeline-item">
-        <div class="job-title">Previous Role</div>
-        <div class="job-meta">Company Name • YYYY–YYYY</div>
-        <ul>
-          <li>Improved operational efficiency and delivered strategic initiatives.</li>
-          <li>Used structured problem solving and data-backed recommendations.</li>
-        </ul>
-      </div>
-    </section>
+  </div>
 
-    <section class="card" style="margin-top:24px;">
-      <h2>Signature Projects</h2>
-      <ul>
-        <li>0→1 initiative with customer validation and launch planning.</li>
-        <li>Decision framework for pilot vs full-scale build tradeoff.</li>
-        <li>Metrics dashboard / experimentation / process optimization initiative.</li>
-      </ul>
-    </section>
-  </main>
 </div>
+
 <script>
-function animateValue(el) {
-  const target = +el.dataset.target;
-  let current = 0;
-  const step = Math.max(1, Math.ceil(target / 40));
-  const timer = setInterval(() => {
-    current += step;
-    if (current >= target) {
-      current = target;
-      clearInterval(timer);
-    }
-    el.textContent = current + '+';
-  }, 30);
+
+function clearSteps() {
+  const steps = document.querySelectorAll(".step");
+  steps.forEach(step => {
+    step.classList.remove("active");
+  });
 }
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      document.querySelectorAll('.metric-number').forEach(animateValue);
-      observer.disconnect();
+
+function activateStep(id) {
+  clearSteps();
+  document.getElementById(id).classList.add("active");
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function createEmbedding(text) {
+  return text
+    .toLowerCase()
+    .replace(/[^\w\s]/g, "")
+    .split(" ")
+    .filter(word => word.length > 2);
+}
+
+function similarityScore(queryWords, docWords) {
+
+  let score = 0;
+
+  queryWords.forEach(word => {
+    if (docWords.includes(word)) {
+      score++;
     }
   });
-});
-observer.observe(document.querySelector('.metric'));
+
+  return score;
+}
+
+async function runRAG() {
+
+  const output = document.getElementById("output");
+
+  output.innerHTML = "";
+
+  const kbText = document.getElementById("kb").value;
+  const query = document.getElementById("query").value;
+
+  const chunks = kbText
+    .split("\n")
+    .map(c => c.trim())
+    .filter(c => c.length > 0);
+
+  // STEP 1
+  activateStep("step1");
+
+  output.innerHTML += `
+    <div class="output-section">
+      <div class="label">Document Chunks</div>
+      <div class="box">
+        ${chunks.map(c => `<span class="chip">${c}</span>`).join("")}
+      </div>
+    </div>
+  `;
+
+  await sleep(1200);
+
+  // STEP 2
+  activateStep("step2");
+
+  const embeddings = chunks.map(chunk => {
+    return {
+      text: chunk,
+      vector: createEmbedding(chunk)
+    };
+  });
+
+  output.innerHTML += `
+    <div class="output-section">
+      <div class="label">Vector Embeddings</div>
+      <div class="box">
+        Semantic vectors created for all chunks.
+      </div>
+    </div>
+  `;
+
+  await sleep(1200);
+
+  // STEP 3
+  activateStep("step3");
+
+  const queryEmbedding = createEmbedding(query);
+
+  output.innerHTML += `
+    <div class="output-section">
+      <div class="label">Query Embedding</div>
+      <div class="box">
+        ${queryEmbedding.join(", ")}
+      </div>
+    </div>
+  `;
+
+  await sleep(1200);
+
+  // STEP 4
+  activateStep("step4");
+
+  const ranked = embeddings.map(item => {
+
+    return {
+      text: item.text,
+      score: similarityScore(queryEmbedding, item.vector)
+    };
+
+  }).sort((a, b) => b.score - a.score);
+
+  const topChunks = ranked.slice(0, 2);
+
+  output.innerHTML += `
+    <div class="output-section">
+      <div class="label">Retrieved Chunks</div>
+      <div class="box">
+        ${topChunks.map(c =>
+          `<span class="chip">${c.text} (score: ${c.score})</span>`
+        ).join("")}
+      </div>
+    </div>
+  `;
+
+  await sleep(1200);
+
+  // STEP 5
+  activateStep("step5");
+
+  const prompt = `
+System:
+Answer only using provided context.
+
+Context:
+${topChunks.map(c => "- " + c.text).join("\n")}
+
+User:
+${query}
+  `;
+
+  output.innerHTML += `
+    <div class="output-section">
+      <div class="label">Augmented Prompt</div>
+      <div class="box">
+        <pre>${prompt}</pre>
+      </div>
+    </div>
+  `;
+
+  await sleep(1200);
+
+  // STEP 6
+  activateStep("step6");
+
+  const response = `
+RAG improves LLM responses by retrieving relevant external knowledge before generation.
+This helps the model produce more accurate, contextual, and grounded answers while reducing hallucinations.
+  `;
+
+  output.innerHTML += `
+    <div class="output-section">
+      <div class="label">Generated Response</div>
+      <div class="box response">
+        ${response}
+      </div>
+    </div>
+  `;
+}
+
 </script>
+
 </body>
 </html>
