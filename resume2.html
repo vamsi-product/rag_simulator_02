@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vamsi Akuraju — Senior Product Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #060810;
+    --surface: #0d1117;
+    --surface2: #131a24;
+    --border: #1e2d3d;
+    --accent: #00e5a0;
+    --accent2: #00bfff;
+    --accent3: #7fff7f;
+    --text: #e8f0f8;
+    --text-muted: #6a8099;
+    --text-dim: #3a5068;
+    --danger: #ff4f6d;
+    --gold: #ffd700;
+    --sidebar-w: 260px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ─── PRINT ─────────────────────────────── */
+  @media print {
+    #sidebar, #print-btn, #particles-canvas { display: none !important; }
+    #main { margin-left: 0 !important; }
+    body { background: #fff; color: #111; }
+    .section { page-break-inside: avoid; }
+    :root { --accent: #008855; --text: #111; --text-muted: #444; --surface: #f5f5f5; --bg: #fff; --border: #ccc; }
+  }
+
+  /* ─── CANVAS ─────────────────────────────── */
+  #particles-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.35;
+  }
+
+  /* ─── SIDEBAR ────────────────────────────── */
+  #sidebar {
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    width: var(--sidebar-w);
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    padding: 36px 0 24px;
+    overflow-y: auto;
+  }
+
+  .sidebar-logo {
+    padding: 0 24px 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+
+  .sidebar-logo .monogram {
+    font-family: 'Orbitron', monospace;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--accent);
+    letter-spacing: 2px;
+    line-height: 1;
+  }
+
+  .sidebar-logo .role-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 6px;
+  }
+
+  .nav-section-label {
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    padding: 0 24px 8px;
+  }
+
+  nav a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 24px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 11px;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+    border-left: 2px solid transparent;
+    position: relative;
+  }
+
+  nav a .nav-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  nav a:hover, nav a.active {
+    color: var(--accent);
+    border-left-color: var(--accent);
+    background: rgba(0,229,160,0.04);
+  }
+
+  nav a:hover .nav-dot, nav a.active .nav-dot {
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+  }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 20px 24px 0;
+    border-top: 1px solid var(--border);
+    font-size: 10px;
+    color: var(--text-dim);
+    line-height: 1.8;
+  }
+
+  .sidebar-footer a {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 10px;
+  }
+
+  #print-btn {
+    margin: 16px 24px 0;
+    padding: 8px 0;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 2px;
+  }
+
+  #print-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ─── MAIN ────────────────────────────────── */
+  #main {
+    margin-left: var(--sidebar-w);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ─── HERO ────────────────────────────────── */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 80px 64px;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .hero-grid-lines {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 60px 60px;
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  .hero-content { position: relative; z-index: 2; max-width: 780px; }
+
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,229,160,0.08);
+    border: 1px solid rgba(0,229,160,0.25);
+    color: var(--accent);
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 2px;
+    margin-bottom: 28px;
+    animation: fadeSlideUp 0.6s ease both;
+  }
+
+  .hero-tag::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .hero-name {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(36px, 5vw, 62px);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -1px;
+    color: var(--text);
+    animation: fadeSlideUp 0.6s 0.1s ease both;
+  }
+
+  .hero-name .accent-line {
+    display: block;
+    color: var(--accent);
+    -webkit-text-stroke: 0px;
+    text-shadow: 0 0 40px rgba(0,229,160,0.4);
+  }
+
+  .hero-subtitle {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-top: 14px;
+    letter-spacing: 1px;
+    animation: fadeSlideUp 0.6s 0.2s ease both;
+  }
+
+  .hero-tagline {
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--text-muted);
+    max-width: 560px;
+    line-height: 1.8;
+    animation: fadeSlideUp 0.6s 0.3s ease both;
+  }
+
+  .hero-tagline em {
+    color: var(--accent);
+    font-style: normal;
+  }
+
+  .hero-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 32px;
+    animation: fadeSlideUp 0.6s 0.4s ease both;
+  }
+
+  .chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+
+  .chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .chip.highlight {
+    background: rgba(0,229,160,0.1);
+    border-color: rgba(0,229,160,0.4);
+    color: var(--accent);
+  }
+
+  .hero-metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    margin-top: 52px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    animation: fadeSlideUp 0.6s 0.5s ease both;
+  }
+
+  .hero-metric {
+    background: var(--surface);
+    padding: 20px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-metric::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .hero-metric:hover::before { opacity: 1; }
+
+  .metric-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .metric-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 6px;
+  }
+
+  /* ─── SECTIONS ────────────────────────────── */
+  .section {
+    padding: 72px 64px;
+    border-bottom: 1px solid var(--border);
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .section.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  .section-number {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    opacity: 0.6;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text);
+  }
+
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  /* ─── EXPERIENCE ──────────────────────────── */
+  .exp-item {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 32px;
+    margin-bottom: 52px;
+    padding-bottom: 52px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .exp-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .exp-meta { padding-top: 4px; }
+
+  .exp-company {
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .exp-period {
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 6px;
+    letter-spacing: 1px;
+  }
+
+  .exp-location {
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 3px;
+  }
+
+  .exp-badge {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 2px;
+  }
+
+  .exp-badge.acquisition {
+    background: rgba(255,215,0,0.1);
+    border: 1px solid rgba(255,215,0,0.3);
+    color: var(--gold);
+  }
+
+  .exp-badge.award {
+    background: rgba(0,191,255,0.1);
+    border: 1px solid rgba(0,191,255,0.3);
+    color: var(--accent2);
+  }
+
+  .exp-badge.cofounding {
+    background: rgba(0,229,160,0.1);
+    border: 1px solid rgba(0,229,160,0.3);
+    color: var(--accent);
+  }
+
+  .exp-role {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+  }
+
+  .exp-context {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  .exp-bullets {
+    margin-top: 16px;
+    list-style: none;
+  }
+
+  .exp-bullets li {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    padding: 5px 0 5px 18px;
+    position: relative;
+    line-height: 1.7;
+  }
+
+  .exp-bullets li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-size: 10px;
+    top: 7px;
+  }
+
+  .exp-bullets li strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .exp-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 16px;
+  }
+
+  .exp-tag {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    border-radius: 2px;
+  }
+
+  /* ─── SKILLS ──────────────────────────────── */
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .skill-group {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+
+  .skill-group:hover { border-color: rgba(0,229,160,0.3); }
+
+  .skill-group::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+  }
+
+  .skill-group-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+
+  .skill-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .skill-item {
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+
+  .skill-item:hover {
+    color: var(--accent);
+    border-color: rgba(0,229,160,0.3);
+  }
+
+  /* ─── EDUCATION ───────────────────────────── */
+  .edu-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+
+  .edu-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 28px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .edu-card:hover {
+    border-color: rgba(0,229,160,0.3);
+    transform: translateY(-2px);
+  }
+
+  .edu-degree {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  .edu-uni {
+    font-size: 11px;
+    color: var(--accent);
+    margin-top: 6px;
+    letter-spacing: 1px;
+  }
+
+  .edu-year {
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  /* ─── RECOGNITION ─────────────────────────── */
+  .recognition-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .rec-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px 28px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    transition: border-color 0.2s;
+  }
+
+  .rec-card:hover { border-color: rgba(0,229,160,0.3); }
+
+  .rec-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .rec-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  .rec-body {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    line-height: 1.6;
+  }
+
+  /* ─── KEYFRAMES ───────────────────────────── */
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── SCROLLBAR ───────────────────────────── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+  /* ─── RESPONSIVE ──────────────────────────── */
+  @media (max-width: 900px) {
+    :root { --sidebar-w: 0px; }
+    #sidebar { display: none; }
+    #hero { padding: 60px 28px; }
+    .section { padding: 52px 28px; }
+    .hero-metrics { grid-template-columns: repeat(2, 1fr); }
+    .exp-item { grid-template-columns: 1fr; gap: 12px; }
+    .skills-grid { grid-template-columns: 1fr; }
+    .edu-grid { grid-template-columns: 1fr; }
+    .recognition-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Summary section */
+  .summary-text {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.9;
+    max-width: 760px;
+    border-left: 2px solid var(--accent);
+    padding-left: 24px;
+  }
+
+  .summary-text em {
+    color: var(--accent);
+    font-style: normal;
+  }
+
+  /* Impact bar */
+  .impact-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    margin-top: 36px;
+    border: 1px solid var(--border);
+  }
+
+  .impact-cell {
+    background: var(--surface);
+    padding: 20px 24px;
+  }
+
+  .impact-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent2);
+  }
+
+  .impact-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    margin-top: 5px;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<!-- Particle Canvas -->
+<canvas id="particles-canvas"></canvas>
+
+<!-- Sidebar -->
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <div class="monogram">VA</div>
+    <div class="role-label">Senior Product Manager</div>
+  </div>
+  <div class="nav-section-label">Navigate</div>
+  <nav id="nav">
+    <a href="#hero" data-section="hero"><span class="nav-dot"></span> Profile</a>
+    <a href="#summary" data-section="summary"><span class="nav-dot"></span> Summary</a>
+    <a href="#experience" data-section="experience"><span class="nav-dot"></span> Experience</a>
+    <a href="#skills" data-section="skills"><span class="nav-dot"></span> Skills</a>
+    <a href="#education" data-section="education"><span class="nav-dot"></span> Education</a>
+    <a href="#recognition" data-section="recognition"><span class="nav-dot"></span> Recognition</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div>Hyderabad, India</div>
+    <div><a href="mailto:vamsi@example.com">vamsi.akuraju@gmail.com</a></div>
+    <div><a href="https://linkedin.com/in/vamsiakuraju" target="_blank">linkedin.com/in/vamsiakuraju</a></div>
+    <button id="print-btn" onclick="window.print()">⬡ Print / Save PDF</button>
+  </div>
+</aside>
+
+<!-- Main -->
+<main id="main">
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-grid-lines"></div>
+    <div class="hero-content">
+      <div class="hero-tag">Open to opportunities · PM / PO · ESG · Analytics</div>
+      <h1 class="hero-name">
+        Vamsi<br>
+        <span class="accent-line">Akuraju</span>
+      </h1>
+      <div class="hero-subtitle">Senior Product Manager &nbsp;·&nbsp; B2B SaaS &nbsp;·&nbsp; ESG &amp; Sustainability</div>
+      <p class="hero-tagline">
+        10 years building <em>software products that decarbonise industries</em> — from early-stage startups to €80M acquisitions. I shifted from ESG domain work to software product delivery because I identified <em>software quality as the real bottleneck in sustainability impact</em>.
+      </p>
+      <div class="hero-chips">
+        <span class="chip highlight">ESG SaaS</span>
+        <span class="chip highlight">Carbon Management</span>
+        <span class="chip highlight">AI-Powered Products</span>
+        <span class="chip">Analytics PM</span>
+        <span class="chip">B2B Enterprise</span>
+        <span class="chip">Agile / SAFe-aligned</span>
+        <span class="chip">Co-Founder CPO</span>
+      </div>
+      <div class="hero-metrics">
+        <div class="hero-metric">
+          <div class="metric-value" data-target="80" data-suffix="M€">0</div>
+          <div class="metric-label">Plan A Acquisition Value</div>
+        </div>
+        <div class="hero-metric">
+          <div class="metric-value" data-target="4.7" data-suffix="M€" data-decimal="1">0</div>
+          <div class="metric-label">Funding Raised — Revalu</div>
+        </div>
+        <div class="hero-metric">
+          <div class="metric-value" data-target="100" data-suffix="%">0</div>
+          <div class="metric-label">YoY User Growth</div>
+        </div>
+        <div class="hero-metric">
+          <div class="metric-value" data-target="75" data-suffix="%">0</div>
+          <div class="metric-label">Delivery Velocity Uplift</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUMMARY -->
+  <section id="summary" class="section">
+    <div class="section-header">
+      <span class="section-number">01</span>
+      <h2 class="section-title">Profile Summary</h2>
+      <div class="section-line"></div>
+    </div>
+    <p class="summary-text">
+      Senior PM/CPO with ~10 years of experience in <em>B2B SaaS for ESG and sustainability</em>, spanning carbon accounting, supply-chain transparency, and AI-powered materials intelligence. Proven track record as an early employee and co-founder: part of the team at <em>Plan A</em> that scaled to a €80M acquisition, and co-founded <em>Revalu Impact AG</em> — raising €4.7M and winning the Germany AI in Sustainability Award 2024. Deep expertise in translating climate science and regulatory frameworks (CSRD, TCFD, GHG Protocol) into scalable software products. Comfortable across the full product stack — discovery, roadmapping, agile delivery, data platform ownership, and AI feature development. Published researcher (PIK Potsdam / Elsevier). UNFCCC Civil Society Observer. Al Gore Climate Reality Ambassador (2018).
+    </p>
+    <div class="impact-strip">
+      <div class="impact-cell">
+        <div class="impact-num">2×</div>
+        <div class="impact-label">M1 Retention (QoQ) — Plan A</div>
+      </div>
+      <div class="impact-cell">
+        <div class="impact-num">50–75%</div>
+        <div class="impact-label">Delivery velocity via Cursor.ai / Builder.io</div>
+      </div>
+      <div class="impact-cell">
+        <div class="impact-num">100%</div>
+        <div class="impact-label">YoY User Growth — Revalu</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experience" class="section">
+    <div class="section-header">
+      <span class="section-number">02</span>
+      <h2 class="section-title">Experience</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <!-- Revalu -->
+    <div class="exp-item">
+      <div class="exp-meta">
+        <div class="exp-company">Revalu Impact AG</div>
+        <div class="exp-period">2022 — Present</div>
+        <div class="exp-location">Berlin / Remote</div>
+        <div class="exp-badge cofounding">Co-Founder &amp; CPO</div>
+        <div class="exp-badge award" style="margin-top:6px;">🏆 DE AI Award 2024</div>
+      </div>
+      <div class="exp-body">
+        <div class="exp-role">Co-Founder &amp; Chief Product Officer</div>
+        <div class="exp-context">AI-powered materials intelligence platform for the construction &amp; real estate sector — €4.7M raised</div>
+        <ul class="exp-bullets">
+          <li>Defined and owned the <strong>end-to-end product vision</strong> from zero → product-market fit, raising €4.7M and onboarding enterprise clients across DACH.</li>
+          <li>Built AI-powered materials data platform enabling <strong>embodied carbon analysis</strong> and <strong>circular economy decision-making</strong> at the product design stage.</li>
+          <li>Delivered <strong>100% YoY user growth</strong> by repositioning the platform from a data tool to a workflow integration product embedded in design pipelines.</li>
+          <li>Drove <strong>50–75% improvement in delivery velocity</strong> by integrating Cursor.ai and Builder.io into engineering and no-code workflows — a documented best practice shared across the team.</li>
+          <li>Led cross-functional teams across engineering, data science, design, and GTM; introduced SAFe-aligned sprint cadences across a distributed team of 14.</li>
+          <li>Spearheaded the pitch and team narrative that won the <strong>Germany AI in Sustainability Award 2024</strong>.</li>
+        </ul>
+        <div class="exp-tags">
+          <span class="exp-tag">AI / ML</span>
+          <span class="exp-tag">Data Platform</span>
+          <span class="exp-tag">B2B SaaS</span>
+          <span class="exp-tag">Cursor.ai</span>
+          <span class="exp-tag">Builder.io</span>
+          <span class="exp-tag">Agile</span>
+          <span class="exp-tag">Embodied Carbon</span>
+          <span class="exp-tag">DACH Market</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plan A -->
+    <div class="exp-item">
+      <div class="exp-meta">
+        <div class="exp-company">Plan A</div>
+        <div class="exp-period">2019 — 2022</div>
+        <div class="exp-location">Berlin, Germany</div>
+        <div class="exp-badge acquisition">€80M Acquisition</div>
+      </div>
+      <div class="exp-body">
+        <div class="exp-role">Senior Product Manager <span style="color:var(--text-muted); font-size:14px;">(Early Employee)</span></div>
+        <div class="exp-context">Carbon management &amp; ESG SaaS platform — acquired at €80M valuation</div>
+        <ul class="exp-bullets">
+          <li>One of the earliest product hires; <strong>shaped the core carbon accounting product</strong> from MVP through Series A and into the enterprise segment.</li>
+          <li>Doubled <strong>Month-1 retention QoQ</strong> by redesigning onboarding flows based on activation data and cohort analysis in Looker Studio and Hotjar.</li>
+          <li>Owned the <strong>GHG Protocol Scope 1, 2, and 3 calculation engine</strong> — collaborating with climate scientists to ensure regulatory accuracy (CSRD, TCFD, CDP).</li>
+          <li>Drove the platform's expansion into supply-chain emissions features — a key growth lever contributing to the eventual acquisition narrative.</li>
+          <li>Partnered with data engineering to build <strong>self-serve analytics dashboards</strong> used by 100+ enterprise sustainability teams.</li>
+        </ul>
+        <div class="exp-tags">
+          <span class="exp-tag">Carbon Accounting</span>
+          <span class="exp-tag">GHG Protocol</span>
+          <span class="exp-tag">CSRD / TCFD</span>
+          <span class="exp-tag">Looker Studio</span>
+          <span class="exp-tag">Hotjar</span>
+          <span class="exp-tag">SQL</span>
+          <span class="exp-tag">Onboarding</span>
+          <span class="exp-tag">Enterprise SaaS</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Earlier / Research -->
+    <div class="exp-item">
+      <div class="exp-meta">
+        <div class="exp-company">Earlier Roles</div>
+        <div class="exp-period">2015 — 2019</div>
+        <div class="exp-location">Germany / India</div>
+      </div>
+      <div class="exp-body">
+        <div class="exp-role">Product &amp; Research — Sustainability Domain</div>
+        <div class="exp-context">Research, policy analysis, and early product roles in the ESG and energy transition space</div>
+        <ul class="exp-bullets">
+          <li>Published <strong>peer-reviewed research</strong> with the Potsdam Institute for Climate Impact Research (PIK Potsdam) — published in Elsevier journals.</li>
+          <li>Served as a <strong>UNFCCC Civil Society Observer</strong> at COP sessions — engaging in international climate policy frameworks.</li>
+          <li>Credentialed as an <strong>Al Gore Climate Reality Ambassador (2018)</strong> — trained directly in climate communication and action by the Climate Reality Project.</li>
+          <li>Built foundational knowledge in energy systems and grid infrastructure through a B.Tech in Electrical &amp; Electronics Engineering.</li>
+        </ul>
+        <div class="exp-tags">
+          <span class="exp-tag">Climate Research</span>
+          <span class="exp-tag">PIK Potsdam</span>
+          <span class="exp-tag">UNFCCC</span>
+          <span class="exp-tag">Policy Analysis</span>
+          <span class="exp-tag">Energy Systems</span>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills" class="section">
+    <div class="section-header">
+      <span class="section-number">03</span>
+      <h2 class="section-title">Skills &amp; Tooling</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-group">
+        <div class="skill-group-title">Product Management</div>
+        <div class="skill-items">
+          <span class="skill-item">Product Strategy</span>
+          <span class="skill-item">Roadmapping</span>
+          <span class="skill-item">Discovery &amp; Research</span>
+          <span class="skill-item">User Stories</span>
+          <span class="skill-item">Acceptance Criteria</span>
+          <span class="skill-item">OKRs / KPIs</span>
+          <span class="skill-item">A/B Testing</span>
+          <span class="skill-item">Stakeholder Mgmt</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-title">Data &amp; Analytics</div>
+        <div class="skill-items">
+          <span class="skill-item">SQL</span>
+          <span class="skill-item">Looker Studio</span>
+          <span class="skill-item">Hotjar</span>
+          <span class="skill-item">Cohort Analysis</span>
+          <span class="skill-item">Funnel Analysis</span>
+          <span class="skill-item">Retention Modelling</span>
+          <span class="skill-item">Dashboard Design</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-title">AI &amp; Engineering</div>
+        <div class="skill-items">
+          <span class="skill-item">Cursor.ai</span>
+          <span class="skill-item">Builder.io</span>
+          <span class="skill-item">AI Feature Ownership</span>
+          <span class="skill-item">Chunking Strategy</span>
+          <span class="skill-item">LLM Evaluation</span>
+          <span class="skill-item">Agentic Workflows</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-title">Delivery &amp; Agile</div>
+        <div class="skill-items">
+          <span class="skill-item">Jira</span>
+          <span class="skill-item">Confluence</span>
+          <span class="skill-item">SAFe-aligned Agile</span>
+          <span class="skill-item">Sprint Planning</span>
+          <span class="skill-item">Backlog Refinement</span>
+          <span class="skill-item">PI Planning</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-title">ESG &amp; Climate Domain</div>
+        <div class="skill-items">
+          <span class="skill-item">GHG Protocol</span>
+          <span class="skill-item">CSRD</span>
+          <span class="skill-item">TCFD</span>
+          <span class="skill-item">CDP</span>
+          <span class="skill-item">Embodied Carbon</span>
+          <span class="skill-item">Carbon Markets</span>
+          <span class="skill-item">Scope 1/2/3</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-title">Markets &amp; Languages</div>
+        <div class="skill-items">
+          <span class="skill-item">DACH / EU</span>
+          <span class="skill-item">India / APAC</span>
+          <span class="skill-item">B2B Enterprise</span>
+          <span class="skill-item">English (Fluent)</span>
+          <span class="skill-item">German (Working)</span>
+          <span class="skill-item">Telugu (Native)</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EDUCATION -->
+  <section id="education" class="section">
+    <div class="section-header">
+      <span class="section-number">04</span>
+      <h2 class="section-title">Education</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="edu-grid">
+      <div class="edu-card">
+        <div class="edu-degree">MSc Environmental &amp; Resource Management</div>
+        <div class="edu-uni">Brandenburg University of Technology (TU Brandenburg)</div>
+        <div class="edu-year">Germany</div>
+      </div>
+      <div class="edu-card">
+        <div class="edu-degree">B.Tech Electrical &amp; Electronics Engineering</div>
+        <div class="edu-uni">India</div>
+        <div class="edu-year">Foundation in energy systems, grid infrastructure &amp; industrial technology</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RECOGNITION -->
+  <section id="recognition" class="section">
+    <div class="section-header">
+      <span class="section-number">05</span>
+      <h2 class="section-title">Recognition &amp; Credentials</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="recognition-grid">
+      <div class="rec-card">
+        <div class="rec-icon">🏆</div>
+        <div>
+          <div class="rec-title">Germany AI in Sustainability Award 2024</div>
+          <div class="rec-body">Won as CPO and co-founder of Revalu Impact AG — recognising the platform's breakthrough application of AI to embodied carbon and circular materials intelligence in construction.</div>
+        </div>
+      </div>
+      <div class="rec-card">
+        <div class="rec-icon">📄</div>
+        <div>
+          <div class="rec-title">Peer-Reviewed Publication — PIK Potsdam × Elsevier</div>
+          <div class="rec-body">Co-authored climate and sustainability research with the Potsdam Institute for Climate Impact Research, published in Elsevier peer-reviewed journals.</div>
+        </div>
+      </div>
+      <div class="rec-card">
+        <div class="rec-icon">🌐</div>
+        <div>
+          <div class="rec-title">UNFCCC Civil Society Observer</div>
+          <div class="rec-body">Accredited observer to UN Framework Convention on Climate Change (COP) sessions — representing civil society at international climate negotiations.</div>
+        </div>
+      </div>
+      <div class="rec-card">
+        <div class="rec-icon">🌱</div>
+        <div>
+          <div class="rec-title">Al Gore Climate Reality Ambassador (2018)</div>
+          <div class="rec-body">Trained directly by The Climate Reality Project — one of ~1,000 ambassadors globally trained in climate science communication, advocacy, and systems change.</div>
+        </div>
+      </div>
+      <div class="rec-card">
+        <div class="rec-icon">🤖</div>
+        <div>
+          <div class="rec-title">HelloPM AI Product Management — Cohort 50</div>
+          <div class="rec-body">Active cohort covering agentic workflows, LLM evaluation design, and AI product ownership. Applied practice via Whoop fitness product discovery project.</div>
+        </div>
+      </div>
+      <div class="rec-card">
+        <div class="rec-icon">💼</div>
+        <div>
+          <div class="rec-title">€80M Acquisition — Plan A (Early Employee)</div>
+          <div class="rec-body">Key product contributor at Plan A from early stages through to the company's €80M acquisition — doubling M1 retention QoQ and leading expansion into enterprise analytics.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  // ─── PARTICLES ────────────────────────────────────────────────────
+  const canvas = document.getElementById('particles-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function Particle() {
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.vx = (Math.random() - 0.5) * 0.3;
+    this.vy = (Math.random() - 0.5) * 0.3;
+    this.r = Math.random() * 1.2 + 0.3;
+    this.alpha = Math.random() * 0.5 + 0.1;
+  }
+
+  function initParticles() {
+    particles = [];
+    const count = Math.floor((W * H) / 14000);
+    for (let i = 0; i < count; i++) particles.push(new Particle());
+  }
+
+  function drawParticles() {
+    ctx.clearRect(0, 0, W, H);
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < 0) p.x = W;
+      if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H;
+      if (p.y > H) p.y = 0;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(0,229,160,${p.alpha})`;
+      ctx.fill();
+
+      for (let j = i + 1; j < particles.length; j++) {
+        const q = particles[j];
+        const dx = p.x - q.x, dy = p.y - q.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 120) {
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(q.x, q.y);
+          ctx.strokeStyle = `rgba(0,229,160,${0.08 * (1 - dist / 120)})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(drawParticles);
+  }
+
+  window.addEventListener('resize', () => { resize(); initParticles(); });
+  resize();
+  initParticles();
+  drawParticles();
+
+  // ─── COUNTER ANIMATION ────────────────────────────────────────────
+  function animateCounter(el) {
+    const target = parseFloat(el.dataset.target);
+    const suffix = el.dataset.suffix || '';
+    const isDecimal = el.dataset.decimal === '1';
+    const duration = 1800;
+    const start = performance.now();
+
+    function update(now) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = target * eased;
+      el.textContent = (isDecimal ? current.toFixed(1) : Math.round(current)) + suffix;
+      if (progress < 1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+  }
+
+  const counterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        animateCounter(e.target);
+        counterObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  document.querySelectorAll('[data-target]').forEach(el => counterObserver.observe(el));
+
+  // ─── SCROLL REVEAL ────────────────────────────────────────────────
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.section').forEach(s => revealObserver.observe(s));
+
+  // ─── ACTIVE NAV ───────────────────────────────────────────────────
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('nav a');
+
+  const navObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navLinks.forEach(a => a.classList.remove('active'));
+        const active = document.querySelector(`nav a[data-section="${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+
+  sections.forEach(s => navObserver.observe(s));
+</script>
+</body>
+</html>
